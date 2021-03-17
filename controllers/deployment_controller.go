@@ -2,9 +2,13 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/go-logr/logr"
+	"github.com/google/go-containerregistry/pkg/crane"
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -26,7 +30,51 @@ type DeploymentReconciler struct {
 func (r *DeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("deployment", req.NamespacedName)
 
-	// your logic here
+	// Get Deployment
+	depl := &appsv1.Deployment{}
+	err := r.Get(ctx, req.NamespacedName, depl)
+	// Don't requeue if Deployment does not exist
+	if errors.IsNotFound(err) {
+		r.Log.Error(err, "Could not find Deployment")
+		return ctrl.Result{}, nil
+	}
+
+	// Requeue on error
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	r.Log.Info("Reconciling Deployment",
+		"container name", depl.Spec.Template.Spec.Containers[0].Name,
+		"container image", depl.Spec.Template.Spec.Containers[0].Image,
+	)
+
+	for i, container := range depl.Spec.Template.Spec.Containers {
+		// Skip containers already using cloned images
+		if strings.HasPrefix(container.Image, "imageclone/") {
+			continue
+		}
+
+		// Clone image in own repo
+		clone := fmt.Sprintf("%s/%s",
+			"imageclone",
+			strings.ReplaceAll(container.Image, "/", "_"),
+		)
+		err := crane.Copy(container.Image, clone)
+		if err != nil {
+			r.Log.Error(err, "Unable to clone image")
+			return ctrl.Result{}, err
+		}
+
+		depl.Spec.Template.Spec.Containers[i].Image = clone
+	}
+
+	// Update the Deployment
+	err = r.Update(ctx, depl)
+	if err != nil {
+		r.Log.Error(err, "Unable to update Deployment")
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
