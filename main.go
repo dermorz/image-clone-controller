@@ -1,7 +1,3 @@
-/*
-Copyright 2021 Moritz Bracht.
-*/
-
 package main
 
 import (
@@ -18,6 +14,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	"github.com/dermorz/image-clone-controller/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -62,6 +60,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.DeploymentReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("Deployment"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Deployment")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
