@@ -1,0 +1,5 @@
+domain: imageclone.morz.me
+layout: go.kubebuilder.io/v3
+projectName: image-clone-controller
+repo: github.com/dermorz/image-clone-controller
+version: "3"
