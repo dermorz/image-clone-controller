@@ -30,6 +30,14 @@ type DeploymentReconciler struct {
 func (r *DeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("deployment", req.NamespacedName)
 
+	// Ignore Deployments in namespace "kube-system"
+	if req.Namespace == "kube-system" {
+		r.Log.Info(`Ignoring Deployment in namespace "kube-system"`,
+			"deployment", req.NamespacedName,
+		)
+		return ctrl.Result{}, nil
+	}
+
 	// Get Deployment
 	depl := &appsv1.Deployment{}
 	err := r.Get(ctx, req.NamespacedName, depl)
