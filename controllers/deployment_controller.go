@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
+	"github.com/google/go-containerregistry/pkg/authn/k8schain"
 	"github.com/google/go-containerregistry/pkg/crane"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -53,27 +54,50 @@ func (r *DeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	}
 
 	r.Log.Info("Reconciling Deployment",
+		"namespace", req.Namespace,
 		"container name", depl.Spec.Template.Spec.Containers[0].Name,
 		"container image", depl.Spec.Template.Spec.Containers[0].Image,
 	)
 
+	// Get keychain for dockerhub repo
+	k8sc, err := k8schain.NewInCluster(ctx, k8schain.Options{
+		Namespace:        "image-clone-controller-system",
+		ImagePullSecrets: []string{"image-clone-controller-regcred"},
+	})
+	if err != nil {
+		r.Log.Error(err, "Unable to create keychain")
+		return ctrl.Result{}, err
+	}
+
 	for i, container := range depl.Spec.Template.Spec.Containers {
 		// Skip containers already using cloned images
 		if strings.HasPrefix(container.Image, "imageclone/") {
+			r.Log.Info("Already using cloned image",
+				"deployment", req.NamespacedName,
+				"image", container.Image,
+			)
 			continue
 		}
 
-		// Clone image in own repo
 		clone := fmt.Sprintf("%s/%s",
 			"imageclone",
 			strings.ReplaceAll(container.Image, "/", "_"),
 		)
-		err := crane.Copy(container.Image, clone)
+		r.Log.Info("Exchanging container image",
+			"namespace", req.Namespace,
+			"container name", container.Name,
+			"before", container.Image,
+			"after", clone,
+		)
+
+		// Clone image in own repo
+		err = crane.Copy(container.Image, clone, crane.WithAuthFromKeychain(k8sc))
 		if err != nil {
 			r.Log.Error(err, "Unable to clone image")
 			return ctrl.Result{}, err
 		}
 
+		// Modify Container Image to use our cloned image
 		depl.Spec.Template.Spec.Containers[i].Image = clone
 	}
 

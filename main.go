@@ -1,3 +1,7 @@
+/*
+Copyright 2021 Moritz Bracht.
+*/
+
 package main
 
 import (
