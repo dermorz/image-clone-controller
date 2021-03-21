@@ -23,3 +23,6 @@ testbin/*
 *.swp
 *.swo
 *~
+
+# Don't commit generated secrets
+config/manager/secrets/*
