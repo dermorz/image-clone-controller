@@ -104,7 +104,8 @@ func (r *DeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// Update the Deployment
 	err = r.Update(ctx, depl)
 	if errors.IsConflict(err) {
-		r.Log.Info("Deployment was already updated")
+		// Optimistic concurrency
+		r.Log.Info("Deployment has already been updated")
 		return ctrl.Result{}, nil
 	}
 	if err != nil {
