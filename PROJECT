@@ -2,4 +2,10 @@ domain: imageclone.morz.me
 layout: go.kubebuilder.io/v3
 projectName: image-clone-controller
 repo: github.com/dermorz/image-clone-controller
+resources:
+- controller: true
+  group: apps
+  kind: DaemonSet
+  path: k8s.io/api/apps/v1
+  version: v1
 version: "3"
