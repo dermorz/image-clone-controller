@@ -54,7 +54,12 @@ $ make deploy
 ## Disclaimer
 
 This is my first Kubernetes controller, so this probably is far from best
-practices. Nevertheless it was a great learning experience. kubebuilder took
-care of a lot of scaffolding and also helped leading the way.
+practices. There are always things to improve, but learning to write a
+controller by doing it while working and having 2 kids at home during corona
+are the reasons why I kept the scope pretty narrow and went for the naive
+approach.
+
+Nevertheless it was a great learning experience. `kubebuilder` took care of a
+lot of scaffolding and also helped leading the way.
 
 I still have no clue how to properly test a controller. :(
