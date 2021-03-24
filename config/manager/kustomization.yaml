@@ -13,7 +13,7 @@ kind: Kustomization
 images:
 - name: controller
   newName: imageclone/controller
-  newTag: 0.0.15
+  newTag: 0.1.0
 
 secretGenerator:
 - files:
