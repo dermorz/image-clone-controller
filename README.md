@@ -15,7 +15,7 @@ deployment.
 ## Prerequisites
 
 * Kubebuilder (Project was scaffolded with version `3.0.0-beta.0`. Earlier version might not work.)
-* docker (>=`19.0`)
+* docker (>=`19.0` - Earlier versions might work but were not tested.)
 
 ## Setting up the Backup Registry
 
@@ -39,7 +39,7 @@ or just run `tools/generate-pull-secret` and follow the prompt.
 ## How to deploy
 
 ```shell
-$ export IMG=<registry>/<image>:<tag>
+$ export IMG="<registry>/<image>:<tag>"
 $ make docker-build
 $ make docker-push
 $ make deploy
@@ -49,15 +49,16 @@ $ make deploy
 
 * Some source images when retagged trigger a `401 Unauthorized` when pushed to
   the "backup registry".
-* No testing
+* No testing.
 
 ## Disclaimer
 
 This is my first Kubernetes controller, so this probably is far from best
 practices. There are always things to improve, but learning to write a
 controller by doing it while working and having 2 kids at home during corona
-are the reasons why I kept the scope pretty narrow and went for the naive
-approach.
+are the reasons why I kept the scope pretty narrow and went for the
+naive/pragmatic approach. (Like always copying the image, since the push will
+figure out if already exists remotely.)
 
 Nevertheless it was a great learning experience. `kubebuilder` took care of a
 lot of scaffolding and also helped leading the way.
