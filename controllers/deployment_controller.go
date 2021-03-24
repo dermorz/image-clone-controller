@@ -53,12 +53,6 @@ func (r *DeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	r.Log.Info("Reconciling Deployment",
-		"namespace", req.Namespace,
-		"container name", depl.Spec.Template.Spec.Containers[0].Name,
-		"container image", depl.Spec.Template.Spec.Containers[0].Image,
-	)
-
 	// Get keychain for dockerhub repo
 	k8sc, err := k8schain.NewInCluster(ctx, k8schain.Options{
 		Namespace:        "image-clone-controller-system",

@@ -53,12 +53,6 @@ func (r *DaemonSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	r.Log.Info("Reconciling DaemonSet",
-		"namespace", req.Namespace,
-		"container name", ds.Spec.Template.Spec.Containers[0].Name,
-		"container image", ds.Spec.Template.Spec.Containers[0].Image,
-	)
-
 	// Get keychain for dockerhub repo
 	k8sc, err := k8schain.NewInCluster(ctx, k8schain.Options{
 		Namespace:        "image-clone-controller-system",
