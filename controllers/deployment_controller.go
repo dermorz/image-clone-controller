@@ -105,8 +105,8 @@ func (r *DeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	err = r.Update(ctx, depl)
 	if errors.IsConflict(err) {
 		// Optimistic concurrency
-		r.Log.Info("Deployment has already been updated")
-		return ctrl.Result{}, nil
+		r.Log.Info("Deployment has been updated since getting it")
+		return ctrl.Result{Requeue: true}, nil
 	}
 	if err != nil {
 		r.Log.Error(err, "Unable to update Deployment")
