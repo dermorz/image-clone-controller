@@ -58,7 +58,7 @@ practices. There are always things to improve, but learning to write a
 controller by doing it while working and having 2 kids at home during corona
 are the reasons why I kept the scope pretty narrow and went for the
 naive/pragmatic approach. (Like always copying the image, since the push will
-figure out if already exists remotely.)
+figure out if it already exists remotely.)
 
 Nevertheless it was a great learning experience. `kubebuilder` took care of a
 lot of scaffolding and also helped leading the way.
