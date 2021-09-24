@@ -14,12 +14,14 @@ deployment.
 
 ## Prerequisites
 
-* Kubebuilder (Project was scaffolded with version `3.0.0-beta.0`. Earlier version might not work.)
+* Kubebuilder (Project was scaffolded with version `3.0.0-beta.0`. Earlier
+  version might not work.)
 * docker (>=`19.0` - Earlier versions might work but were not tested.)
 
 ## Setting up the Backup Registry
 
-Either create a file `./config/manager/secrets/.dockerconfigjson` with the content:
+Either create a file `./config/manager/secrets/.dockerconfigjson` with the
+content:
 
 ```json
 {
@@ -34,7 +36,7 @@ Either create a file `./config/manager/secrets/.dockerconfigjson` with the conte
 }
 ```
 
-or just run `tools/generate-pull-secret` and follow the prompt.
+or just run `hack/generate_pull_secret.sh` and follow the prompt.
 
 ## How to deploy
 
